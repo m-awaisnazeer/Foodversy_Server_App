@@ -14,4 +14,6 @@
     <string name="menu_category">Categories</string>
     <string name="popular_categories">Popular Categories</string>
     <string name="category_name">Category Name</string>
+    <string name="menu_food_list">Food List</string>
+    <string name="name_of_food">Food Name</string>
 </resources>
