@@ -4,10 +4,11 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.communisolve.foodversyserverapp.R
 import com.communisolve.foodversyserverapp.callbacks.IRecyclerItemClickLitner
+import com.communisolve.foodversyserverapp.callbacks.IOnFoodsListItemMenuClickListner
 import com.communisolve.foodversyserverapp.common.Common
 import com.communisolve.foodversyserverapp.databinding.LayoutFoodItemBinding
 import com.communisolve.foodversyserverapp.model.FoodModel
@@ -15,8 +16,8 @@ import com.communisolve.foodversyserverapp.model.FoodModel
 
 class MyFoodListAdapter(
     internal var context: Context,
-    internal var foodsList: List<FoodModel>
-
+    internal var foodsList: List<FoodModel>,
+    internal var iOnFoodsListItemMenuClickListner:IOnFoodsListItemMenuClickListner
 ) : RecyclerView.Adapter<MyFoodListAdapter.ViewHolder>() {
 
 
@@ -51,6 +52,9 @@ class MyFoodListAdapter(
         binding!!.txtFoodName.setText(foodsList.get(position).name)
         binding!!.txtFoodPrice.setText("$${foodsList.get(position).price.toString()}")
 
+        binding!!.foodsListItemMenu.setOnClickListener {
+            showPopupMenu(it,position,foodsList.get(position))
+        }
 
         holder.setListner(object : IRecyclerItemClickLitner {
             override fun onItemClick(view: View, pos: Int) {
@@ -63,6 +67,28 @@ class MyFoodListAdapter(
 
     }
 
+    private fun showPopupMenu(view: View?, position: Int, foodModel: FoodModel) {
+        var popupmenu: androidx.appcompat.widget.PopupMenu = androidx.appcompat
+            .widget.PopupMenu(view!!.context, view!!)
+        popupmenu.inflate(R.menu.foods_list_item_pop_up_menu)
+        popupmenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.update_food_action -> {
+                    iOnFoodsListItemMenuClickListner.onUpdateItemCLickListner(position, foodModel)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.delete_food_action -> {
+                    iOnFoodsListItemMenuClickListner.onDeleteItemCLickListner(position, foodModel)
+                    return@setOnMenuItemClickListener true
+                }
+                else -> {
+                    return@setOnMenuItemClickListener false
+                }
+            }
+        }
+        popupmenu.show()
+
+    }
 
 
     override fun getItemCount(): Int {

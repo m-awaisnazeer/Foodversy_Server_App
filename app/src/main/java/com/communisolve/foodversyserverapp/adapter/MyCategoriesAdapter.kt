@@ -56,7 +56,7 @@ class MyCategoriesAdapter(
             EventBus.getDefault().postSticky(CategoryClick(true,CategoriesList.get(position)))
         }
 
-        binding!!.cartItemMenu.setOnClickListener {
+        binding!!.categoriesItemMenu.setOnClickListener {
             showPopupMenu(it,position,CategoriesList.get(position))
         }
 //        holder.setListner(object :IRecyclerItemClickLitner{

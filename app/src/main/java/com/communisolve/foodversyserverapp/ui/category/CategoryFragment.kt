@@ -23,11 +23,13 @@ import com.communisolve.foodversyserverapp.adapter.MyCategoriesAdapter
 import com.communisolve.foodversyserverapp.callbacks.IOnCategoriesItemMenuClickListner
 import com.communisolve.foodversyserverapp.common.Common
 import com.communisolve.foodversyserverapp.common.SpacesItemDecoration
+import com.communisolve.foodversyserverapp.eventbus.ToastEvent
 import com.communisolve.foodversyserverapp.model.CategoryModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import dmax.dialog.SpotsDialog
+import org.greenrobot.eventbus.EventBus
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -184,7 +186,7 @@ class CategoryFragment : Fragment(), IOnCategoriesItemMenuClickListner {
             }
             .addOnCompleteListener { task ->
                 categoryViewModel.loadCategory()
-                Toast.makeText(requireContext(), "Update Success", Toast.LENGTH_SHORT).show()
+                EventBus.getDefault().postSticky(ToastEvent(true, false))
             }
     }
 

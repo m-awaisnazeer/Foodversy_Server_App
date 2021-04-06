@@ -2,25 +2,27 @@ package com.communisolve.foodversyserverapp
 
 import android.os.Bundle
 import android.view.Menu
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.navigation.NavigationView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.navigation.NavController
 import com.communisolve.foodversyserverapp.eventbus.CategoryClick
+import com.communisolve.foodversyserverapp.eventbus.ChangeMenuClick
+import com.communisolve.foodversyserverapp.eventbus.ToastEvent
+import com.google.android.material.navigation.NavigationView
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 class HomeActivity : AppCompatActivity() {
 
+    private var menuclick: Int=-1
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
@@ -32,9 +34,9 @@ class HomeActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-         drawerLayout = findViewById(R.id.drawer_layout)
-         navView = findViewById(R.id.nav_view)
-         navController = findNavController(R.id.nav_host_fragment)
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navView = findViewById(R.id.nav_view)
+        navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
@@ -61,8 +63,32 @@ class HomeActivity : AppCompatActivity() {
     fun onCategorySelected(event: CategoryClick) {
         if (event.isClicked) {
 
-            findNavController(R.id.nav_host_fragment).navigate(R.id.nav_foodList)
+            if (menuclick != R.id.nav_foodList){
+                navController.navigate(R.id.nav_foodList)
+                menuclick = R.id.nav_foodList
+            }
         }
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun onChangeMenuEvent(event: ChangeMenuClick) {
+        if (!event.isFromFoodList) {
+            //clear
+            navController.popBackStack(R.id.nav_category, true)
+            navController.navigate(R.id.nav_category)
+        }
+        menuclick = -1
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    fun onToastEvent(event: ToastEvent) {
+
+        if (event.isUpdate){
+            Toast.makeText(this, "Update Success", Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(this, "Delete Success", Toast.LENGTH_SHORT).show()
+        }
+        EventBus.getDefault().postSticky(ChangeMenuClick(event.isBackFromFoodList))
     }
 
     override fun onStart() {
