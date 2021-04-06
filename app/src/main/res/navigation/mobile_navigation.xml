@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_category">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.communisolve.foodversyserverapp.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/nav_category"
+        android:name="com.communisolve.foodversyserverapp.ui.category.CategoryFragment"
+        android:label="@string/menu_category"
+        tools:layout="@layout/fragment_category" />
 
     <fragment
         android:id="@+id/nav_gallery"
