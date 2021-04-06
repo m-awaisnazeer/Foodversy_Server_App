@@ -44,7 +44,7 @@ class CategoryViewModel : ViewModel(), ICategoryCallBackListner {
         return categoryListMutableLiveData!!
     }
 
-    private fun loadCategory() {
+     fun loadCategory() {
         val templist = ArrayList<CategoryModel>()
         val categoryRef = FirebaseDatabase.getInstance().getReference(Common.CATEGORY_REF)
         categoryRef.addListenerForSingleValueEvent(object : ValueEventListener {

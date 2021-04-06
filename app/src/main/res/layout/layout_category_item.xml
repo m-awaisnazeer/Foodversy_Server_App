@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="100dp">
+
 
     <ImageView
         android:id="@+id/img_category"
@@ -21,7 +23,23 @@
         android:layout_gravity="center_vertical"
         android:gravity="center_horizontal"
         android:text="@string/popular_categories"
+        android:layout_centerInParent="true"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp" />
-</FrameLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_more_vert_24"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="5dp"
+        android:scaleType="fitXY"
+        android:id="@+id/cart_item_menu"
+        android:layout_marginTop="4dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        app:tint="@color/white" />
+
+</RelativeLayout>

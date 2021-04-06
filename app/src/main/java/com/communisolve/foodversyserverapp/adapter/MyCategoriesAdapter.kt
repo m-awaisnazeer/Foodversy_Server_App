@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.communisolve.foodversyserverapp.R
+import com.communisolve.foodversyserverapp.callbacks.IOnCategoriesItemMenuClickListner
 import com.communisolve.foodversyserverapp.callbacks.IRecyclerItemClickLitner
 import com.communisolve.foodversyserverapp.common.Common
 import com.communisolve.foodversyserverapp.databinding.LayoutCategoryItemBinding
@@ -16,7 +18,8 @@ import org.greenrobot.eventbus.EventBus
 
 class MyCategoriesAdapter(
     internal var context: Context,
-    internal var CategoriesList: List<CategoryModel>
+    internal var CategoriesList: List<CategoryModel>,
+    var iOnCategoriesItemMenuClickListner:IOnCategoriesItemMenuClickListner
 
 ) : RecyclerView.Adapter<MyCategoriesAdapter.ViewHolder>() {
     var binding: LayoutCategoryItemBinding? = null
@@ -53,6 +56,9 @@ class MyCategoriesAdapter(
             EventBus.getDefault().postSticky(CategoryClick(true,CategoriesList.get(position)))
         }
 
+        binding!!.cartItemMenu.setOnClickListener {
+            showPopupMenu(it,position,CategoriesList.get(position))
+        }
 //        holder.setListner(object :IRecyclerItemClickLitner{
 //            override fun onItemClick(view: View, pos: Int) {
 //                Common.categorySelected = CategoriesList.get(pos)
@@ -79,4 +85,23 @@ class MyCategoriesAdapter(
     override fun getItemCount(): Int {
         return CategoriesList.size
     }
+
+    private fun showPopupMenu(view: View?, position: Int, categoryModel: CategoryModel) {
+        var popupmenu: androidx.appcompat.widget.PopupMenu = androidx.appcompat
+            .widget.PopupMenu(view!!.context, view!!)
+        popupmenu.inflate(R.menu.categories_item_pop_up_menu)
+        popupmenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_update -> {
+                    iOnCategoriesItemMenuClickListner.onUpdateItemCLickListner(position,categoryModel)
+                    return@setOnMenuItemClickListener true
+                }
+                else -> {
+                    return@setOnMenuItemClickListener false
+                }
+            }
+        }
+        popupmenu.show()
+    }
+
 }

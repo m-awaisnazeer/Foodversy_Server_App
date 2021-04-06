@@ -13,4 +13,5 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_category">Categories</string>
     <string name="popular_categories">Popular Categories</string>
+    <string name="category_name">Category Name</string>
 </resources>
