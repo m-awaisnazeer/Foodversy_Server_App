@@ -1,7 +1,9 @@
 package com.communisolve.foodversyserverapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -15,7 +17,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.communisolve.foodversyserverapp.eventbus.CategoryClick
 import com.communisolve.foodversyserverapp.eventbus.ChangeMenuClick
 import com.communisolve.foodversyserverapp.eventbus.ToastEvent
+import com.google.android.gms.common.internal.service.Common
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -41,11 +45,25 @@ class HomeActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_category, R.id.nav_foodList, R.id.nav_slideshow
+                R.id.nav_category, R.id.nav_foodList, R.id.nav_list_orders
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        val headerView = navView.getHeaderView(0)
+        val txt_user = headerView.findViewById<TextView>(R.id.txt_user)
+        txt_user.setText("Hey, ${com.communisolve.foodversyserverapp.common.Common.currentServerUser!!.name}")
+        navView.menu.findItem(R.id.nav_signout).setOnMenuItemClickListener {
+            FirebaseAuth.getInstance().signOut()
+            com.communisolve.foodversyserverapp.common.Common.currentServerUser = null
+            com.communisolve.foodversyserverapp.common.Common.categorySelected = null
+            com.communisolve.foodversyserverapp.common.Common.foodSelected = null
+
+            startActivity(Intent(this,MainActivity::class.java))
+            finish()
+            return@setOnMenuItemClickListener true
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

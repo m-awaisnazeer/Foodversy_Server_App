@@ -16,4 +16,6 @@
     <string name="category_name">Category Name</string>
     <string name="menu_food_list">Food List</string>
     <string name="name_of_food">Food Name</string>
+    <string name="menu_signout">Sign out</string>
+    <string name="menu_orders">Orders</string>
 </resources>

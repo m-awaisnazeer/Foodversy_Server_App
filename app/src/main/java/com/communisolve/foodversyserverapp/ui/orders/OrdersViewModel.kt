@@ -1,10 +1,10 @@
-package com.communisolve.foodversyserverapp.ui.slideshow
+package com.communisolve.foodversyserverapp.ui.orders
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class SlideshowViewModel : ViewModel() {
+class OrdersViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is slideshow Fragment"
