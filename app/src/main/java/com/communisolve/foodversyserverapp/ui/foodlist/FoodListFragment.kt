@@ -21,9 +21,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.communisolve.foodversyserverapp.R
+import com.communisolve.foodversyserverapp.SizeAddonEditActivity
 import com.communisolve.foodversyserverapp.adapter.MyFoodListAdapter
 import com.communisolve.foodversyserverapp.callbacks.IOnFoodsListItemMenuClickListner
 import com.communisolve.foodversyserverapp.common.Common
+import com.communisolve.foodversyserverapp.eventbus.AddonSizeEditEvent
 import com.communisolve.foodversyserverapp.eventbus.ChangeMenuClick
 import com.communisolve.foodversyserverapp.eventbus.ToastEvent
 import com.communisolve.foodversyserverapp.model.FoodModel
@@ -49,8 +51,6 @@ class FoodListFragment : Fragment(), IOnFoodsListItemMenuClickListner {
     private lateinit var dialog: AlertDialog
     var imageUri: Uri? = null
 
-
-    private var foodModelList: List<FoodModel>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -191,6 +191,19 @@ class FoodListFragment : Fragment(), IOnFoodsListItemMenuClickListner {
 
         val deleteDialog = builder.create()
         deleteDialog.show()
+    }
+
+    override fun onAddonItemCLickListner(position: Int, foodModel: FoodModel) {
+        Common.foodSelected = foodModels!![position]
+        startActivity(Intent(requireContext(),SizeAddonEditActivity::class.java))
+        EventBus.getDefault().postSticky(AddonSizeEditEvent(true,position))
+
+    }
+
+    override fun onSizeItemCLickListner(position: Int, foodModel: FoodModel) {
+        Common.foodSelected = foodModels!![position]
+        startActivity(Intent(requireContext(),SizeAddonEditActivity::class.java))
+        EventBus.getDefault().postSticky(AddonSizeEditEvent(false,position))
     }
 
     private fun updateFood(foods: MutableList<FoodModel>?, isDelete: Boolean) {

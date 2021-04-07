@@ -9,4 +9,12 @@
         android:title="Delete"
         android:id="@+id/delete_food_action"/>
 
+    <item
+        android:title="Edit Addon"
+        android:id="@+id/addon_food_action"/>
+
+    <item
+        android:title="Edit Size"
+        android:id="@+id/size_food_action"/>
+
 </menu>

@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.communisolve.foodversyserverapp.R
-import com.communisolve.foodversyserverapp.callbacks.IRecyclerItemClickLitner
 import com.communisolve.foodversyserverapp.callbacks.IOnFoodsListItemMenuClickListner
+import com.communisolve.foodversyserverapp.callbacks.IRecyclerItemClickLitner
 import com.communisolve.foodversyserverapp.common.Common
 import com.communisolve.foodversyserverapp.databinding.LayoutFoodItemBinding
 import com.communisolve.foodversyserverapp.model.FoodModel
@@ -17,9 +17,8 @@ import com.communisolve.foodversyserverapp.model.FoodModel
 class MyFoodListAdapter(
     internal var context: Context,
     internal var foodsList: List<FoodModel>,
-    internal var iOnFoodsListItemMenuClickListner:IOnFoodsListItemMenuClickListner
+    internal var iOnFoodsListItemMenuClickListner: IOnFoodsListItemMenuClickListner
 ) : RecyclerView.Adapter<MyFoodListAdapter.ViewHolder>() {
-
 
 
     var binding: LayoutFoodItemBinding? = null
@@ -53,7 +52,7 @@ class MyFoodListAdapter(
         binding!!.txtFoodPrice.setText("$${foodsList.get(position).price.toString()}")
 
         binding!!.foodsListItemMenu.setOnClickListener {
-            showPopupMenu(it,position,foodsList.get(position))
+            showPopupMenu(it, position, foodsList.get(position))
         }
 
         holder.setListner(object : IRecyclerItemClickLitner {
@@ -79,6 +78,14 @@ class MyFoodListAdapter(
                 }
                 R.id.delete_food_action -> {
                     iOnFoodsListItemMenuClickListner.onDeleteItemCLickListner(position, foodModel)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.addon_food_action -> {
+                    iOnFoodsListItemMenuClickListner.onAddonItemCLickListner(position, foodModel)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.size_food_action -> {
+                    iOnFoodsListItemMenuClickListner.onSizeItemCLickListner(position, foodModel)
                     return@setOnMenuItemClickListener true
                 }
                 else -> {
