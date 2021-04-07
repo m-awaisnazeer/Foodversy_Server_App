@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.communisolve.foodversyserverapp.R
+import com.communisolve.foodversyserverapp.callbacks.IOnOrderItemMenuClickListener
 import com.communisolve.foodversyserverapp.common.Common
 import com.communisolve.foodversyserverapp.databinding.LayoutOrderItemBinding
 import com.communisolve.foodversyserverapp.model.OrderModel
@@ -14,7 +16,8 @@ import java.text.SimpleDateFormat
 
 class MyOrderAdapter(
     var context: Context,
-    var orderList: List<OrderModel>
+    var orderList: MutableList<OrderModel>,
+    var iOnOrderItemMenuClickListener: IOnOrderItemMenuClickListener
 ) : RecyclerView.Adapter<MyOrderAdapter.ViewHolder>() {
     private lateinit var binding: LayoutOrderItemBinding
     lateinit var simpleDateFormat: SimpleDateFormat
@@ -57,7 +60,55 @@ class MyOrderAdapter(
             binding.txtName, Color.parseColor("#006061")
         )
 
+        binding.moreMenuOptions.setOnClickListener {
+            showPopupMenu(it, position, orderList[position])
+        }
     }
 
+
     override fun getItemCount(): Int = orderList.size
+
+
+    private fun showPopupMenu(view: View?, position: Int, orderModel: OrderModel) {
+        var popupmenu: androidx.appcompat.widget.PopupMenu = androidx.appcompat
+            .widget.PopupMenu(view!!.context, view!!)
+        popupmenu.inflate(R.menu.order_item_menu)
+        popupmenu.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_edit -> {
+                    iOnOrderItemMenuClickListener.onEditSelectionCliclListener(position, orderModel)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.action_remove -> {
+                    iOnOrderItemMenuClickListener.onRemoveSelectionCliclListener(
+                        position,
+                        orderModel
+                    )
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.action_call -> {
+                    iOnOrderItemMenuClickListener.onCallSelectionCliclListener(position, orderModel)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.action_direction -> {
+                    iOnOrderItemMenuClickListener.onDirectionSelectionCliclListener(
+                        position,
+                        orderModel
+                    )
+                    return@setOnMenuItemClickListener true
+                }
+                else -> {
+                    return@setOnMenuItemClickListener false
+                }
+            }
+        }
+        popupmenu.show()
+
+    }
+
+    fun removeItemAt(position: Int) {
+//        orderList.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
 }
