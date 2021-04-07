@@ -18,7 +18,6 @@
         android:orderInCategory="100"
         android:title="filter"
         android:iconTint="@color/white"
-        app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always" />
 
 </menu>

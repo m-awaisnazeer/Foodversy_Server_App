@@ -47,7 +47,7 @@ class MyOrderAdapter(
         )
 
         Common.setSpanStringColor(
-            "Num of Items ", (if (orderList[position].cartItemList != null) "0"
+            "Num of Items ", (if (orderList[position].cartItemList == null) "0"
             else orderList[position].cartItemList!!.size).toString(),
             binding.txtNumberOfItems, Color.parseColor("#00574B")
         )

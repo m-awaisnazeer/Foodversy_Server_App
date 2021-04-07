@@ -5,9 +5,20 @@
     android:layout_height="match_parent"
     tools:context=".ui.orders.OdersFragment">
 
+<TextView
+    android:layout_width="match_parent"
+    android:id="@+id/txt_order_filter"
+    android:text="Orders (0)"
+    android:padding="16dp"
+    android:textSize="20sp"
+    android:textStyle="bold"
+    android:gravity="center"
+    android:drawableLeft="@drawable/ic_baseline_speaker_notes_24"
+    android:layout_height="wrap_content"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_order"
+        android:layout_below="@id/txt_order_filter"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

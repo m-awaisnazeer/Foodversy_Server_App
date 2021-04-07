@@ -26,7 +26,7 @@ class OrdersViewModel : ViewModel(), IOrderCallbackListner {
         return ordersList
     }
 
-    private fun loadOrder(status: Int) {
+     fun loadOrder(status: Int) {
         val tempList: MutableList<OrderModel> = ArrayList()
         val orderRef = FirebaseDatabase.getInstance().getReference(Common.ORDER_REF)
             .orderByChild("orderStatus")
@@ -50,7 +50,7 @@ class OrdersViewModel : ViewModel(), IOrderCallbackListner {
 
     override fun onOrderLoadSuccess(ordersList: List<OrderModel>) {
         Log.d("VMTAG", "onOrderLoadSuccess: ${ordersList.size}")
-        if (ordersList.size > 0)
+        if (ordersList.size >= 0)
             this.ordersList.value = ordersList.sortedBy { it.createDate }
     }
 

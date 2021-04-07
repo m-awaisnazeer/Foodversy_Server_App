@@ -11,7 +11,13 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.communisolve.foodversyserverapp.R
 import com.communisolve.foodversyserverapp.adapter.MyOrderAdapter
+import com.communisolve.foodversyserverapp.common.BottomSheetOrderfragment
 import com.communisolve.foodversyserverapp.databinding.FragmentOrdersBinding
+import com.communisolve.foodversyserverapp.eventbus.ChangeMenuClick
+import com.communisolve.foodversyserverapp.eventbus.LoadOrderEvent
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class OdersFragment : Fragment() {
 
@@ -31,6 +37,7 @@ class OdersFragment : Fragment() {
         ordersViewModel.getOrderModelList().observe(viewLifecycleOwner, Observer {
             binding.recyclerOrder.adapter = MyOrderAdapter(requireContext(), it)
             binding.recyclerOrder.layoutAnimation = layoutAnimationController
+            binding.txtOrderFilter.setText("Orders (${it.size})")
         })
 
         ordersViewModel.messageError.observe(viewLifecycleOwner, Observer {
@@ -57,5 +64,42 @@ class OdersFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.order_list_menu, menu)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.action_filter -> {
+                val bottomSheet = BottomSheetOrderfragment.instance
+                bottomSheet!!.show(requireActivity().supportFragmentManager,"OrderList")
+            }
+        }
+        return true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        if (EventBus.getDefault().hasSubscriberForEvent(LoadOrderEvent::class.java))
+            EventBus.getDefault().removeStickyEvent(LoadOrderEvent::class.java)
+
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this)
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        EventBus.getDefault().postSticky(ChangeMenuClick(true))
+        super.onDestroy()
+    }
+
+    @Subscribe(sticky = true,threadMode = ThreadMode.MAIN)
+    fun onLoadOrder(event:LoadOrderEvent){
+        Toast.makeText(requireContext(), "${event.status}", Toast.LENGTH_SHORT).show()
+        ordersViewModel.loadOrder(event.status)
     }
 }
