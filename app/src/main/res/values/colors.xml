@@ -14,4 +14,6 @@
     <color name="dialog_header_color">#C5C5C5</color>
     <color name="dialog_text_color">#464646</color>
     <color name="light_red">#e6414a</color>
+    <color name="dark_red">#FB5555</color>
+
 </resources>

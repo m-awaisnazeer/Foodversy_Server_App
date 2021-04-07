@@ -1,13 +1,61 @@
 package com.communisolve.foodversyserverapp.ui.orders
 
-import androidx.lifecycle.LiveData
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.communisolve.foodversyserverapp.callbacks.IOrderCallbackListner
+import com.communisolve.foodversyserverapp.common.Common
+import com.communisolve.foodversyserverapp.model.OrderModel
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
-class OrdersViewModel : ViewModel() {
+class OrdersViewModel : ViewModel(), IOrderCallbackListner {
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is slideshow Fragment"
+    private val ordersList = MutableLiveData<List<OrderModel>>()
+    val messageError = MutableLiveData<String>()
+    private val iOrderCallbackListner: IOrderCallbackListner
+
+    init {
+        iOrderCallbackListner = this
     }
-    val text: LiveData<String> = _text
+
+    fun getOrderModelList(): MutableLiveData<List<OrderModel>> {
+        loadOrder(0)
+        return ordersList
+    }
+
+    private fun loadOrder(status: Int) {
+        val tempList: MutableList<OrderModel> = ArrayList()
+        val orderRef = FirebaseDatabase.getInstance().getReference(Common.ORDER_REF)
+            .orderByChild("orderStatus")
+            .equalTo(status.toDouble())
+        orderRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (itemSnapshot in snapshot.children) {
+                    val orderModel = itemSnapshot.getValue(OrderModel::class.java)
+                    orderModel!!.key = itemSnapshot.key!!
+                    tempList.add(orderModel)
+                }
+                iOrderCallbackListner.onOrderLoadSuccess(tempList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                iOrderCallbackListner.onOrderLoadFailed(error.message)
+            }
+
+        })
+    }
+
+    override fun onOrderLoadSuccess(ordersList: List<OrderModel>) {
+        Log.d("VMTAG", "onOrderLoadSuccess: ${ordersList.size}")
+        if (ordersList.size > 0)
+            this.ordersList.value = ordersList.sortedBy { it.createDate }
+    }
+
+    override fun onOrderLoadFailed(message: String) {
+        messageError.value = message
+    }
+
 }
