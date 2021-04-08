@@ -19,6 +19,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.communisolve.foodversy.model.FCMSendData
+import com.communisolve.foodversy.remote.RetrofitFCMClient
 import com.communisolve.foodversyserverapp.R
 import com.communisolve.foodversyserverapp.adapter.MyOrderAdapter
 import com.communisolve.foodversyserverapp.callbacks.IOnOrderItemMenuClickListener
@@ -28,20 +30,31 @@ import com.communisolve.foodversyserverapp.databinding.FragmentOrdersBinding
 import com.communisolve.foodversyserverapp.eventbus.ChangeMenuClick
 import com.communisolve.foodversyserverapp.eventbus.LoadOrderEvent
 import com.communisolve.foodversyserverapp.model.OrderModel
+import com.communisolve.foodversyserverapp.model.TokenModel
+import com.communisolve.foodversyserverapp.remote.IFCMService
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
+import dmax.dialog.SpotsDialog
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
 {
-    var currentOrdersStausFilter:Int=0
+    private var compositeDisposable = CompositeDisposable()
+    private lateinit var ifcmService: IFCMService
+    var currentOrdersStausFilter: Int = 0
     var adapter: MyOrderAdapter? = null
     var iOnOrderItemMenuClickListener = object : IOnOrderItemMenuClickListener {
         override fun onEditSelectionCliclListener(position: Int, orderModel: OrderModel) {
@@ -127,11 +140,11 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         var layout_dialog: View? = null
         var builder: AlertDialog.Builder? = null
 
-        var rdi_shipping:RadioButton? =null
-        var rdi_shipped:RadioButton? =null
-        var rdi_cancelled:RadioButton? =null
-        var rdi_deleted:RadioButton? =null
-        var rdi_restore_placed:RadioButton? =null
+        var rdi_shipping: RadioButton? = null
+        var rdi_shipped: RadioButton? = null
+        var rdi_cancelled: RadioButton? = null
+        var rdi_deleted: RadioButton? = null
+        var rdi_restore_placed: RadioButton? = null
 
 
         if (orderModel.orderStatus == -1) {
@@ -168,7 +181,6 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         //view
         val btn_ok = layout_dialog.findViewById<View>(R.id.btn_ok) as Button
         val btn_cancel = layout_dialog.findViewById<View>(R.id.btn_cancel) as Button
-
 
 
         val txt_status = layout_dialog.findViewById<View>(R.id.txt_status) as TextView
@@ -240,11 +252,94 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
                 .addOnFailureListener {
                     Toast.makeText(requireContext(), "${it.message}", Toast.LENGTH_SHORT).show()
                 }.addOnSuccessListener {
+
+                    val dialog =
+                        SpotsDialog.Builder().setContext(requireContext()).setCancelable(false)
+                            .build()
+                    dialog.show()
+
+                    //loadToken
+                    FirebaseDatabase.getInstance()
+                        .getReference(Common.TOKEN_REF)
+                        .child(orderModel.userId)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    val tokenModel = snapshot.getValue(TokenModel::class.java)
+                                    val notiData = HashMap<String, String>()
+                                    notiData.put(Common.NOTI_TITLE!!, "Your Order was update")
+                                    notiData.put(
+                                        Common.NOTI_CONTENT!!, StringBuilder("Your Order ")
+                                            .append(orderModel.key)
+                                            .append(" was updated to ")
+                                            .append(Common.convertStatustoString(status)).toString()
+                                    )
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "Token: ${tokenModel!!.token}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    val sendData = FCMSendData(tokenModel!!.token, notiData)
+
+                                    compositeDisposable.add(
+                                        ifcmService.sendNotification(sendData)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({ FcmResponse ->
+                                                if (FcmResponse.success != 0) {
+                                                    dialog.dismiss()
+                                                    Toast.makeText(
+                                                        requireContext(),
+                                                        "Update Order Successfully",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                        .show()
+
+                                                } else {
+                                                    dialog.dismiss()
+                                                    Toast.makeText(
+                                                        requireContext(),
+                                                        "Failed to Send Notification",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                        .show()
+                                                }
+                                            }, {
+                                                dialog.dismiss()
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "${it.message}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            })
+                                    )
+
+
+                                } else {
+                                    dialog.dismiss()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "User token not found",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                dialog.dismiss()
+                                Toast.makeText(
+                                    requireContext(),
+                                    "${error.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        })
+
                     adapter!!.removeItemAt(position)
                     updateTextCounter()
                     populateData()
-                    Toast.makeText(requireContext(), "Update Order Success", Toast.LENGTH_SHORT)
-                        .show()
+
                 }
         } else {
             Toast.makeText(requireContext(), "Order Number must not be empty", Toast.LENGTH_SHORT)
@@ -271,7 +366,7 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         //val root = inflater.inflate(R.layout.fragment_food_list, container, false)
         binding = FragmentOrdersBinding.inflate(inflater)
         initViews()
-       populateData()
+        populateData()
 
         return binding.root
     }
@@ -298,6 +393,7 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
     }
 
     private fun initViews() {
+        ifcmService = RetrofitFCMClient.getInstance().create(IFCMService::class.java)
         setHasOptionsMenu(true)
         layoutAnimationController =
             AnimationUtils.loadLayoutAnimation(context, R.anim.layout_item_from_left)
@@ -337,6 +433,8 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
 
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this)
+
+        compositeDisposable.clear()
         super.onStop()
     }
 

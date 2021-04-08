@@ -47,7 +47,7 @@ object Common {
 
     val NOTI_CONTENT: String?="content"
     val NOTI_TITLE: String?="title"
-    private val TOKEN_REF: String="Tokens"
+     val TOKEN_REF: String="Tokens"
     fun updateToken(context: Context, token: String) {
         if (currentServerUser!=null)
             FirebaseDatabase.getInstance().getReference(Common.TOKEN_REF)
@@ -99,8 +99,6 @@ object Common {
             -1 -> "Cancelled"
             else -> "Error"
         }
-
-
     val ORDER_REF: String="Orders"
     var foodSelected: FoodModel? = null
     var categorySelected: CategoryModel? = null
