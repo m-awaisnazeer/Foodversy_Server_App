@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             val serverModel =
-                ServerUserModel(user.uid, edt_name.text.toString(), edt_name.text.toString(), false)
+                ServerUserModel(user.uid, edt_name.text.toString(), edt_name.text.toString(), true)
 
             dialog!!.show()
             serverRef!!.child(serverModel.uid).setValue(serverModel).addOnFailureListener {
