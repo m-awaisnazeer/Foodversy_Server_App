@@ -15,6 +15,7 @@ import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.google.firebase.iid.FirebaseInstanceId
 import dmax.dialog.SpotsDialog
 import java.util.*
 
@@ -102,9 +103,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun goToHomeActivity(userModel: ServerUserModel) {
         dialog!!.dismiss()
-        Common.currentServerUser = userModel
-        startActivity(Intent(this,HomeActivity::class.java))
-        finish()
+//        Common.currentServerUser = userModel
+//        startActivity(Intent(this,HomeActivity::class.java))
+//        finish()
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnFailureListener {
+                Toast.makeText(this, "${it.message}", Toast.LENGTH_SHORT).show()
+                Common.currentServerUser = userModel
+                startActivity(Intent(this, HomeActivity::class.java))
+                finish()
+            }
+            .addOnCompleteListener {
+                Common.currentServerUser = userModel
+                Common.updateToken(this, it.result!!.token)
+                startActivity(Intent(this, HomeActivity::class.java))
+                finish()
+            }
     }
 
     private fun showRegisterDialog(user: FirebaseUser) {
@@ -176,4 +190,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
+
 }

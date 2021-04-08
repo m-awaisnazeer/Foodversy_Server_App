@@ -20,6 +20,7 @@ import com.communisolve.foodversyserverapp.eventbus.ToastEvent
 import com.google.android.gms.common.internal.service.Common
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -38,6 +39,7 @@ class HomeActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        subscribttoTopic(com.communisolve.foodversyserverapp.common.Common.getNewOrderTopic())
         drawerLayout = findViewById(R.id.drawer_layout)
         navView = findViewById(R.id.nav_view)
         navController = findNavController(R.id.nav_host_fragment)
@@ -66,6 +68,18 @@ class HomeActivity : AppCompatActivity() {
         }
 
        // menuclick = R.id.nav_category //Default
+    }
+
+    private fun subscribttoTopic(newOrderTopic: String?) {
+        FirebaseMessaging.getInstance()
+            .subscribeToTopic(newOrderTopic!!)
+            .addOnFailureListener {
+                Toast.makeText(this, "${it.message}", Toast.LENGTH_SHORT).show()
+            }.addOnCompleteListener {
+                if (!it.isSuccessful){
+                    Toast.makeText(this, "Subcribe Topic Failed", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
