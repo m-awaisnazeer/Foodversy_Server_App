@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        providers = Arrays.asList(AuthUI.IdpConfig.PhoneBuilder().build())
+        providers = Arrays.asList(AuthUI.IdpConfig.PhoneBuilder().build(),AuthUI.IdpConfig.GoogleBuilder().build())
 
         serverRef = FirebaseDatabase.getInstance().getReference(Common.SERVER_REF)
         firebaseAuth = FirebaseAuth.getInstance()
@@ -190,7 +190,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
 }

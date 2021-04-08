@@ -267,18 +267,14 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
                                 if (snapshot.exists()) {
                                     val tokenModel = snapshot.getValue(TokenModel::class.java)
                                     val notiData = HashMap<String, String>()
-                                    notiData.put(Common.NOTI_TITLE!!, "Your Order was update")
+                                    notiData.put(Common.NOTI_TITLE!!, "Your order ${orderModel.key} was updated")
                                     notiData.put(
-                                        Common.NOTI_CONTENT!!, StringBuilder("Your Order ")
-                                            .append(orderModel.key)
-                                            .append(" was updated to ")
+                                        Common.NOTI_CONTENT!!, StringBuilder("Your order ")
+                                            .append("status")
+                                            .append(" changed to ")
                                             .append(Common.convertStatustoString(status)).toString()
                                     )
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "Token: ${tokenModel!!.token}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+
                                     val sendData = FCMSendData(tokenModel!!.token, notiData)
 
                                     compositeDisposable.add(
