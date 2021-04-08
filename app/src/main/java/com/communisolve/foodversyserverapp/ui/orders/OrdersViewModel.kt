@@ -10,6 +10,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.*
+import kotlin.collections.ArrayList
 
 class OrdersViewModel : ViewModel(), IOrderCallbackListner {
 
@@ -26,7 +28,7 @@ class OrdersViewModel : ViewModel(), IOrderCallbackListner {
         return ordersList
     }
 
-     fun loadOrder(status: Int) {
+    fun loadOrder(status: Int) {
         val tempList: MutableList<OrderModel> = ArrayList()
         val orderRef = FirebaseDatabase.getInstance().getReference(Common.ORDER_REF)
             .orderByChild("orderStatus")
@@ -50,8 +52,14 @@ class OrdersViewModel : ViewModel(), IOrderCallbackListner {
 
     override fun onOrderLoadSuccess(ordersList: List<OrderModel>) {
         Log.d("VMTAG", "onOrderLoadSuccess: ${ordersList.size}")
-        if (ordersList.size >= 0)
-            this.ordersList.value = ordersList.sortedBy { it.createDate }
+        if (ordersList.size >= 0) {
+            Collections.sort(ordersList) { t1, t2 ->
+                if (t1.createDate < t2.createDate) return@sort -1
+                if (t1.createDate == t2.createDate) 0 else 1
+            }
+
+        }
+        this.ordersList.value = ordersList
     }
 
     override fun onOrderLoadFailed(message: String) {

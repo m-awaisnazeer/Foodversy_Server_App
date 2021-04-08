@@ -7,9 +7,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
+import android.widget.Button
+import android.widget.RadioButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,10 +41,11 @@ import org.greenrobot.eventbus.ThreadMode
 
 class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
 {
+    var currentOrdersStausFilter:Int=0
     var adapter: MyOrderAdapter? = null
     var iOnOrderItemMenuClickListener = object : IOnOrderItemMenuClickListener {
         override fun onEditSelectionCliclListener(position: Int, orderModel: OrderModel) {
-            Toast.makeText(requireContext(), "Edit", Toast.LENGTH_SHORT).show()
+            showEditDialog(position, orderModel)
         }
 
         override fun onRemoveSelectionCliclListener(position: Int, orderModel: OrderModel) {
@@ -57,7 +62,7 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
                         .addOnCompleteListener {
                             Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show()
                             adapter!!.removeItemAt(position)
-                            binding.txtOrderFilter.setText("Orders (${adapter!!.itemCount})")
+                            updateTextCounter()
                             dialogInterface.dismiss()
                         }.addOnFailureListener {
                             Toast.makeText(requireContext(), "${it.message}", Toast.LENGTH_SHORT)
@@ -117,6 +122,143 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         }
 
     }
+
+    private fun showEditDialog(position: Int, orderModel: OrderModel) {
+        var layout_dialog: View? = null
+        var builder: AlertDialog.Builder? = null
+
+        var rdi_shipping:RadioButton? =null
+        var rdi_shipped:RadioButton? =null
+        var rdi_cancelled:RadioButton? =null
+        var rdi_deleted:RadioButton? =null
+        var rdi_restore_placed:RadioButton? =null
+
+
+        if (orderModel.orderStatus == -1) {
+            layout_dialog = LayoutInflater.from(requireContext())
+                .inflate(R.layout.layout_dialog_cancelled, null)
+            builder = AlertDialog.Builder(requireContext()).setView(layout_dialog)
+
+            rdi_restore_placed =
+                layout_dialog.findViewById<View>(R.id.rdi_restore_placed) as RadioButton
+            rdi_deleted = layout_dialog.findViewById<View>(R.id.rdi_deleted) as RadioButton
+
+
+        } else if (orderModel.orderStatus == 0) {
+            layout_dialog = LayoutInflater.from(requireContext())
+                .inflate(R.layout.layout_dialog_shipping, null)
+            builder = AlertDialog.Builder(
+                requireContext(),
+                android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
+            ).setView(layout_dialog)
+            rdi_shipping = layout_dialog.findViewById<View>(R.id.rdi_shipping) as RadioButton
+            rdi_cancelled = layout_dialog.findViewById<View>(R.id.rdi_cancelled) as RadioButton
+
+        } else {
+            layout_dialog = LayoutInflater.from(requireContext())
+                .inflate(R.layout.layout_dialog_shipped, null)
+            builder = AlertDialog.Builder(
+                requireContext()
+            ).setView(layout_dialog)
+            rdi_shipped = layout_dialog.findViewById<View>(R.id.rdi_shipped) as RadioButton
+            rdi_cancelled = layout_dialog.findViewById<View>(R.id.rdi_cancelled) as RadioButton
+
+        }
+
+        //view
+        val btn_ok = layout_dialog.findViewById<View>(R.id.btn_ok) as Button
+        val btn_cancel = layout_dialog.findViewById<View>(R.id.btn_cancel) as Button
+
+
+
+        val txt_status = layout_dialog.findViewById<View>(R.id.txt_status) as TextView
+
+        //set Data
+        txt_status.setText("Order Status(${Common.convertStatustoString(orderModel.orderStatus)})")
+
+        //create Dialog
+        val dialog = builder.create()
+        dialog.show()
+
+        btn_cancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        btn_ok.setOnClickListener {
+            dialog.dismiss()
+            if (rdi_cancelled != null && rdi_cancelled.isChecked) {
+                updateOrder(position, orderModel, -1)
+                currentOrdersStausFilter = -1
+                EventBus.getDefault().postSticky(LoadOrderEvent(-1))
+            } else if (rdi_shipping != null && rdi_shipping.isChecked) {
+                updateOrder(position, orderModel, 1)
+                currentOrdersStausFilter = 1
+                EventBus.getDefault().postSticky(LoadOrderEvent(1))
+            } else if (rdi_shipped != null && rdi_shipped.isChecked) {
+                updateOrder(position, orderModel, 2)
+                currentOrdersStausFilter = 2
+                EventBus.getDefault().postSticky(LoadOrderEvent(2))
+            } else if (rdi_restore_placed != null && rdi_restore_placed.isChecked) {
+                updateOrder(position, orderModel, 0)
+                currentOrdersStausFilter = 0
+                EventBus.getDefault().postSticky(LoadOrderEvent(0))
+            } else if (rdi_deleted != null && rdi_deleted.isChecked) {
+                deleteOrder(position, orderModel)
+            }
+        }
+    }
+
+    private fun deleteOrder(position: Int, orderModel: OrderModel) {
+        if (!TextUtils.isEmpty(orderModel.key)) {
+
+            FirebaseDatabase.getInstance().getReference(Common.ORDER_REF)
+                .child(orderModel.key)
+                .removeValue()
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "${it.message}", Toast.LENGTH_SHORT).show()
+                }.addOnSuccessListener {
+                    adapter!!.removeItemAt(position)
+                    updateTextCounter()
+                    Toast.makeText(requireContext(), "Update Order Success", Toast.LENGTH_SHORT)
+                        .show()
+                    populateData()
+                }
+        } else {
+            Toast.makeText(requireContext(), "Order Number must not be empty", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    private fun updateOrder(position: Int, orderModel: OrderModel, status: Int) {
+
+        if (!TextUtils.isEmpty(orderModel.key)) {
+            val update_data = HashMap<String, Any>()
+            update_data.put("orderStatus", status)
+
+            FirebaseDatabase.getInstance().getReference(Common.ORDER_REF)
+                .child(orderModel.key)
+                .updateChildren(update_data)
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "${it.message}", Toast.LENGTH_SHORT).show()
+                }.addOnSuccessListener {
+                    adapter!!.removeItemAt(position)
+                    updateTextCounter()
+                    populateData()
+                    Toast.makeText(requireContext(), "Update Order Success", Toast.LENGTH_SHORT)
+                        .show()
+                }
+        } else {
+            Toast.makeText(requireContext(), "Order Number must not be empty", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    private fun updateTextCounter() {
+        if (adapter != null)
+            binding.txtOrderFilter.setText("${Common.convertStatustoString(currentOrdersStausFilter)} Orders(${adapter!!.itemCount})")
+
+
+    }
+
     val ordersViewModel: OrdersViewModel by viewModels()
     private lateinit var binding: FragmentOrdersBinding
     lateinit var layoutAnimationController: LayoutAnimationController
@@ -129,7 +271,12 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         //val root = inflater.inflate(R.layout.fragment_food_list, container, false)
         binding = FragmentOrdersBinding.inflate(inflater)
         initViews()
-        Toast.makeText(requireContext(), "test", Toast.LENGTH_SHORT).show()
+       populateData()
+
+        return binding.root
+    }
+
+    private fun populateData() {
         ordersViewModel.getOrderModelList().observe(viewLifecycleOwner, Observer {
             adapter = MyOrderAdapter(
                 requireContext(),
@@ -137,14 +284,12 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
             )
             binding.recyclerOrder.adapter = adapter
             binding.recyclerOrder.layoutAnimation = layoutAnimationController
-            binding.txtOrderFilter.setText("Orders (${it.size})")
+            updateTextCounter()
         })
 
         ordersViewModel.messageError.observe(viewLifecycleOwner, Observer {
             Toast.makeText(requireContext(), "${it}", Toast.LENGTH_SHORT).show()
         })
-
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -172,9 +317,12 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
             R.id.action_filter -> {
                 val bottomSheet = BottomSheetOrderfragment.instance
                 bottomSheet!!.show(requireActivity().supportFragmentManager, "OrderList")
+                return true
+            }
+            else -> {
+                return super.onOptionsItemSelected(item)
             }
         }
-        return true
     }
 
     override fun onStart() {
@@ -199,23 +347,8 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     fun onLoadOrder(event: LoadOrderEvent) {
-        Toast.makeText(requireContext(), "${event.status}", Toast.LENGTH_SHORT).show()
+        currentOrdersStausFilter = event.status
         ordersViewModel.loadOrder(event.status)
     }
 
-//    override fun onEditSelectionCliclListener(position: Int, orderModel: OrderModel) {
-//
-//    }
-//
-//    override fun onRemoveSelectionCliclListener(position: Int, orderModel: OrderModel) {
-//
-//    }
-//
-//    override fun onCallSelectionCliclListener(position: Int, orderModel: OrderModel) {
-//
-//    }
-//
-//    override fun onDirectionSelectionCliclListener(position: Int, orderModel: OrderModel) {
-//
-//    }
 }

@@ -64,6 +64,8 @@ class HomeActivity : AppCompatActivity() {
             finish()
             return@setOnMenuItemClickListener true
         }
+
+       // menuclick = R.id.nav_category //Default
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
