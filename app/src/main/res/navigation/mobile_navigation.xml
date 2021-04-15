@@ -23,6 +23,15 @@
             app:popUpTo="@+id/nav_category"
             app:popUpToInclusive="true"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_list_shippers"
+        android:name="com.communisolve.foodversyserverapp.ui.shipper.ShipperFragment"
+        android:label="@string/menu_shippers"
+        tools:layout="@layout/shipper_fragment" >
+
+    </fragment>
+
     <fragment
         android:id="@+id/nav_list_orders"
         android:name="com.communisolve.foodversyserverapp.ui.orders.OdersFragment"

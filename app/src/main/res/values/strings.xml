@@ -8,6 +8,19 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <!--FB SDK-->
+    <string name="facebook_app_id" translatable="false">887667415134249</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb887667415134249</string>
+    <string name="fb_login_cancel_message">Facebook login is cancelled. Please try again later!</string>
+    <string name="fb_login_error_message">Unable to login with Facebook. Please try again later!</string>
+    <string name="social_login_error_message">Unable to login with selected platform. Please try again later!</string>
+
+    <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb') for Firebase SSO -->
+    <string name="facebook_application_id" translatable="false">@string/facebook_app_id</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">@string/fb_login_protocol_scheme</string>
+    <string name="ok_text">OK</string>
+
+
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
@@ -18,4 +31,5 @@
     <string name="name_of_food">Food Name</string>
     <string name="menu_signout">Sign out</string>
     <string name="menu_orders">Orders</string>
+    <string name="menu_shippers">Shippers</string>
 </resources>

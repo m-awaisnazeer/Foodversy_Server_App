@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "69868085762-kj8dq80jb43cnjmn462ai6j79r0m7ion.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.communisolve.foodversy",
+            "certificate_hash": "d30028d3b8e02d60f6ffe205857bb6f6fa43a0c4"
+          }
+        },
+        {
           "client_id": "69868085762-02mu3iqr08iq1qrthqlp0up0hrdk36pd.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -56,6 +64,51 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.communisolve.foodversyserverapp",
+            "certificate_hash": "13ad0040f6577856824fdb96a0b0b6345e23261d"
+          }
+        },
+        {
+          "client_id": "69868085762-uno80q2d9ea16grrfo7mqur3unp6og0g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.communisolve.foodversyserverapp",
+            "certificate_hash": "d30028d3b8e02d60f6ffe205857bb6f6fa43a0c4"
+          }
+        },
+        {
+          "client_id": "69868085762-02mu3iqr08iq1qrthqlp0up0hrdk36pd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrcDXJ4AMq-fZstFzHQDDLv3GVNlPI52I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "69868085762-02mu3iqr08iq1qrthqlp0up0hrdk36pd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:69868085762:android:2afde8c2d3e93f48c6fd1b",
+        "android_client_info": {
+          "package_name": "com.communisolve.foodversyshippersapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "69868085762-kkinjf8h1drgocjm740gu8l5a55sg06v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.communisolve.foodversyshippersapp",
             "certificate_hash": "13ad0040f6577856824fdb96a0b0b6345e23261d"
           }
         },
