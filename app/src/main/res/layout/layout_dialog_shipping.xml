@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@android:color/white"
     android:orientation="vertical"
     android:paddingLeft="24dp"
@@ -62,19 +63,14 @@
             android:textSize="22sp" />
     </RadioGroup>
 
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/recycler_shipper"
         android:layout_above="@id/layout_button"
         android:layout_below="@id/rdi_group"
-        android:scrollbars="none">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="a"
-            android:textSize="500sp"/>
-    </ScrollView>
+        tools:listitem="@layout/layout_shipper_selected">
+    </androidx.recyclerview.widget.RecyclerView>
 
     <LinearLayout
         android:id="@+id/layout_button"

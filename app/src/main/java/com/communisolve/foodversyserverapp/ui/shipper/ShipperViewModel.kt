@@ -1,10 +1,14 @@
 package com.communisolve.foodversyserverapp.ui.shipper
 
+import android.app.AlertDialog
+import android.widget.Button
+import android.widget.RadioButton
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.communisolve.foodversyserverapp.callbacks.IShipperLoadCallbackListner
 import com.communisolve.foodversyserverapp.common.Common
 import com.communisolve.foodversyserverapp.model.CategoryModel
+import com.communisolve.foodversyserverapp.model.OrderModel
 import com.communisolve.foodversyserverapp.model.ShipperUserModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -23,6 +27,22 @@ class ShipperViewModel : ViewModel(), IShipperLoadCallbackListner {
     }
     override fun onShippersLoadSuccess(shipperUsersList: List<ShipperUserModel>) {
         shippersListMutableLiveData!!.value = shipperUsersList
+    }
+
+    override fun onShipperLoadSuccess(
+        pos: Int,
+        orderModel: OrderModel?,
+        shipperUsersList: List<ShipperUserModel>?,
+        dialog: AlertDialog?,
+        ok: Button?,
+        cancel: Button?,
+        rdi_shipping: RadioButton,
+        rdi_shipped: RadioButton,
+        rdi_canceled: RadioButton,
+        rdi_delete: RadioButton,
+        rdi_restore: RadioButton?
+    ) {
+        // do nothing
     }
 
 
