@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             }
             .addOnCompleteListener {
                 Common.currentServerUser = userModel
-                Common.updateToken(this, it.result!!.token)
+                Common.updateToken(this, it.result!!.token,true,false)
                 startActivity(Intent(this, HomeActivity::class.java))
                 finish()
             }

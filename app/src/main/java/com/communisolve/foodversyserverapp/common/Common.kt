@@ -50,7 +50,9 @@ object Common {
     val NOTI_CONTENT: String?="content"
     val NOTI_TITLE: String?="title"
      val TOKEN_REF: String="Tokens"
-    fun updateToken(context: Context, token: String) {
+    fun updateToken(context: Context, token: String,
+                    isServerToken: Boolean,
+                    isShipperToken: Boolean) {
         if (currentServerUser!=null)
             FirebaseDatabase.getInstance().getReference(Common.TOKEN_REF)
             .child(Common.currentServerUser!!.uid)

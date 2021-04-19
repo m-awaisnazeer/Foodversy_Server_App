@@ -429,7 +429,74 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     dialog.dismiss()
-                    updateOrder(position, orderModel, 1)
+                    //loadToken
+                    FirebaseDatabase.getInstance()
+                        .getReference(Common.TOKEN_REF)
+                        .child(shipperUserModel.key)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    val tokenModel = snapshot.getValue(TokenModel::class.java)
+                                    val notiData = HashMap<String, String>()
+                                    notiData.put(
+                                        Common.NOTI_TITLE!!,
+                                        "You have new Shipping Request"
+                                    )
+                                    notiData.put(
+                                        Common.NOTI_CONTENT!!, StringBuilder("You have new Order need shipping").toString()
+                                    )
+
+                                    val sendData = FCMSendData(tokenModel!!.token, notiData)
+
+                                    compositeDisposable.add(
+                                        ifcmService.sendNotification(sendData)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe({ FcmResponse ->
+                                                if (FcmResponse.success != 0) {
+                                                    dialog.dismiss()
+                                                    updateOrder(position, orderModel, 1)
+
+                                                } else {
+                                                    dialog.dismiss()
+                                                    Toast.makeText(
+                                                        requireContext(),
+                                                        "Failed to Send Notification",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                        .show()
+                                                }
+                                            }, {
+                                                dialog.dismiss()
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "${it.message}",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            })
+                                    )
+
+
+                                } else {
+                                    dialog.dismiss()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "User token not found",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                dialog.dismiss()
+                                Toast.makeText(
+                                    requireContext(),
+                                    "${error.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        })
                     Toast.makeText(
                         requireContext(),
                         "Order has been sent to ${shipperUserModel.name}",

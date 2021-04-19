@@ -1,5 +1,7 @@
 package com.communisolve.foodversyserverapp.model
 
-data class TokenModel(var uid: String="",var token: String="") {
-
-}
+class TokenModel(
+    var uid: String = "", var token: String = "",
+    var serverToken: Boolean = false,
+    var shipperToken: Boolean = false
+)
