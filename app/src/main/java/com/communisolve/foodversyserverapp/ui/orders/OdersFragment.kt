@@ -425,7 +425,7 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         )
 
         FirebaseDatabase.getInstance().getReference(Common.SHIPPING_ORDER_REF)
-            .push().setValue(shipperOrderModel)
+            .child(shipperOrderModel.orderModel!!.key).setValue(shipperOrderModel)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     dialog.dismiss()
