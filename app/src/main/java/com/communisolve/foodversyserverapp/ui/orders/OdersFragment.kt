@@ -35,6 +35,7 @@ import com.communisolve.foodversyserverapp.eventbus.ChangeMenuClick
 import com.communisolve.foodversyserverapp.eventbus.LoadOrderEvent
 import com.communisolve.foodversyserverapp.model.OrderModel
 import com.communisolve.foodversyserverapp.model.ShipperUserModel
+import com.communisolve.foodversyserverapp.model.ShippingOrderModel
 import com.communisolve.foodversyserverapp.model.TokenModel
 import com.communisolve.foodversyserverapp.remote.IFCMService
 import com.google.firebase.database.DataSnapshot
@@ -312,7 +313,18 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
                         it.adapter = myShipperSelectedAdapter
                     }
                 }
-                showDialog(position,orderModel!!,dialog,btnOk!!,btnCancel!!,rdiShipping, rdiShipped, rdiCancelled, rdiDeleted, rdiRestorePlaced)
+                showDialog(
+                    position,
+                    orderModel!!,
+                    dialog,
+                    btnOk!!,
+                    btnCancel!!,
+                    rdiShipping,
+                    rdiShipped,
+                    rdiCancelled,
+                    rdiDeleted,
+                    rdiRestorePlaced
+                )
 
 //
 //                shipperLoadCallbackListner.onShipperLoadSuccess(
@@ -370,12 +382,7 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
                 if (myShipperSelectedAdapter != null) {
                     shipperUserModel = myShipperSelectedAdapter!!.selectedShipper
                     if (shipperUserModel != null) {
-                        Toast.makeText(
-                            requireContext(),
-                            "${shipperUserModel.name}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        dialog.dismiss()
+                        createShipperOrder(position,shipperUserModel, orderModel, dialog)
                     } else {
                         Toast.makeText(
                             requireContext(),
@@ -400,6 +407,41 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
                 dialog.dismiss()
             }
         }
+    }
+
+    private fun createShipperOrder(
+        position: Int,
+        shipperUserModel: ShipperUserModel,
+        orderModel: OrderModel,
+        dialog: AlertDialog
+    ) {
+        var shipperOrderModel: ShippingOrderModel = ShippingOrderModel(
+            shipperUserModel.phone,
+            shipperUserModel.name,
+            -1.0,
+            -1.0,
+            orderModel,
+            false
+        )
+
+        FirebaseDatabase.getInstance().getReference(Common.SHIPPING_ORDER_REF)
+            .push().setValue(shipperOrderModel)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    dialog.dismiss()
+                    updateOrder(position, orderModel, 1)
+                    Toast.makeText(
+                        requireContext(),
+                        "Order has been sent to ${shipperUserModel.name}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                }
+            }
+            .addOnFailureListener { e ->
+                dialog.dismiss()
+                Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun deleteOrder(position: Int, orderModel: OrderModel) {
@@ -547,6 +589,8 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         binding = FragmentOrdersBinding.inflate(inflater)
         initViews()
         populateData()
+
+
 
         return binding.root
     }
