@@ -1,16 +1,23 @@
 package com.communisolve.foodversyserverapp.adapter
 
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.communisolve.foodversyserverapp.R
 import com.communisolve.foodversyserverapp.callbacks.IOnOrderItemMenuClickListener
 import com.communisolve.foodversyserverapp.common.Common
+import com.communisolve.foodversyserverapp.databinding.LayoutDialogOrderDetailBinding
 import com.communisolve.foodversyserverapp.databinding.LayoutOrderItemBinding
+import com.communisolve.foodversyserverapp.model.CartItem
 import com.communisolve.foodversyserverapp.model.OrderModel
 import java.text.SimpleDateFormat
 
@@ -63,6 +70,10 @@ class MyOrderAdapter(
         binding.moreMenuOptions.setOnClickListener {
             showPopupMenu(it, position, orderList[position])
         }
+
+        binding.root.setOnClickListener {
+            showDialog(orderList[position].cartItemList!!)
+        }
     }
 
 
@@ -104,6 +115,29 @@ class MyOrderAdapter(
         }
         popupmenu.show()
 
+    }
+
+    private fun showDialog(cartItems: List<CartItem>) {
+        val layoutDialongBinding =
+            LayoutDialogOrderDetailBinding.inflate(LayoutInflater.from(context))
+        val builder = AlertDialog.Builder(context)
+        builder.setView(layoutDialongBinding.root)
+        layoutDialongBinding.recyclerOrderDetail.apply {
+            setHasFixedSize(true)
+            val mLayoutManager = LinearLayoutManager(context)
+            layoutManager = mLayoutManager
+            addItemDecoration(DividerItemDecoration(context, mLayoutManager.orientation))
+            adapter = MyOrderDetailAdapter(context, cartItems)
+        }
+        val dialog = builder.create()
+        dialog.show()
+
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window!!.setGravity(Gravity.CENTER)
+
+        layoutDialongBinding.btnOk.setOnClickListener {
+            dialog.dismiss()
+        }
     }
 
     fun removeItemAt(position: Int) {
