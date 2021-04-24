@@ -425,14 +425,14 @@ class OdersFragment : Fragment()//, IOnOrderItemMenuClickListener
         )
 
         FirebaseDatabase.getInstance().getReference(Common.SHIPPING_ORDER_REF)
-            .child(shipperOrderModel.orderModel!!.key).setValue(shipperOrderModel)
+            .child(orderModel!!.key).setValue(shipperOrderModel)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     dialog.dismiss()
                     //loadToken
                     FirebaseDatabase.getInstance()
                         .getReference(Common.TOKEN_REF)
-                        .child(shipperUserModel.key)
+                        .child(shipperUserModel!!.key)
                         .addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if (snapshot.exists()) {

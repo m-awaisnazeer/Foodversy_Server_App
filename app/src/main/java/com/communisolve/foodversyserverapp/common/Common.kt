@@ -55,8 +55,8 @@ object Common {
                     isShipperToken: Boolean) {
         if (currentServerUser!=null)
             FirebaseDatabase.getInstance().getReference(Common.TOKEN_REF)
-            .child(Common.currentServerUser!!.uid)
-            .setValue(TokenModel(currentServerUser!!.uid,token))
+            .child(Common.currentServerUser!!.uid!!)
+            .setValue(TokenModel(currentServerUser!!.phone,token))
             .addOnFailureListener { Toast.makeText(context, "$token", Toast.LENGTH_SHORT).show() }
             .addOnSuccessListener {  }
 
